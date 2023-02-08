@@ -1,0 +1,80 @@
+package main;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.newdawn.slick.Music;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
+
+
+public class AudioPlayer {
+
+	public static Map<String, Sound> soundMap = new HashMap<String, Sound>();
+	public static Map<String, Music> musicMap = new HashMap<String, Music>();
+
+	public AudioPlayer() {
+		
+	}
+	
+	public static void load(){
+		try {
+			
+			//Music / ambiance
+				musicMap.put("forest_ambiance", new Music("res/audio/forest_ambiance.ogg"));
+				
+			//Sounds
+				soundMap.put("pistol_shot2", new Sound("res/audio/pistol_shot2.ogg"));
+				soundMap.put("pistol_ammo", new Sound("res/audio/pistol_ammo.ogg"));
+				soundMap.put("shotgun_ammo", new Sound("res/audio/shotgun_ammo.ogg"));
+				soundMap.put("pistol_blank", new Sound("res/audio/pistol_blank.ogg"));
+				
+				soundMap.put("shotgun_shot", new Sound("res/audio/shotgun_shot.ogg"));
+				soundMap.put("AR_shot", new Sound("res/audio/AR_shot.ogg"));
+				soundMap.put("SMG_shot", new Sound("res/audio/SMG_shot.ogg"));
+				
+				
+				soundMap.put("pistol_reload", new Sound("res/audio/pistol_reload.ogg"));
+				soundMap.put("smg_reload", new Sound("res/audio/smg_reload.ogg"));
+				soundMap.put("assault_reload", new Sound("res/audio/assault_reload.ogg"));
+
+				soundMap.put("bullet_box", new Sound("res/audio/bullet_box.ogg"));
+				soundMap.put("bullet_zombie", new Sound("res/audio/bullet_zombie.ogg"));
+				soundMap.put("zombie_death", new Sound("res/audio/zombie_death.ogg"));
+				soundMap.put("zombie_bite", new Sound("res/audio/zombie_bite.ogg"));
+				soundMap.put("player_death", new Sound("res/audio/player_death.ogg"));
+				soundMap.put("player_pain", new Sound("res/audio/player_pain.ogg"));
+				
+				
+				soundMap.put("grenade_pin", new Sound("res/audio/grenade_pin.ogg"));
+				soundMap.put("grenade_throw", new Sound("res/audio/grenade_throw.ogg"));
+				soundMap.put("grenade_bounce", new Sound("res/audio/grenade_bounce.ogg"));
+				soundMap.put("grenade_roll", new Sound("res/audio/grenade_roll.ogg"));
+				soundMap.put("grenade_explosion", new Sound("res/audio/grenade_explosion.ogg"));
+				
+				//soundMap.put("box_break", new Sound("res/audio/box_break.ogg"));
+				
+				soundMap.put("melee_swing_miss", new Sound("res/audio/melee_swing_miss.ogg"));
+				soundMap.put("melee_swing_hit", new Sound("res/audio/melee_swing_hit.ogg"));
+
+				soundMap.put("ammo_pickup", new Sound("res/audio/ammo_pickup.ogg"));
+				
+				soundMap.put("walk_sound1", new Sound("res/audio/walk_sound1.ogg"));
+				soundMap.put("walk_sound2", new Sound("res/audio/walk_sound2.ogg"));
+				
+				soundMap.put("purchase_sound", new Sound("res/audio/purchase_sound.ogg"));
+				
+		} catch (SlickException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static Music getMusic(String key) {
+		return musicMap.get(key);
+		
+	}
+	
+	public static Sound getSound(String key) {
+		return soundMap.get(key);
+		
+	}
+}

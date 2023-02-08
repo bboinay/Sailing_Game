@@ -1,0 +1,47 @@
+package com.main;
+
+
+public class Camera {
+
+	private double x, y;
+	private Game game;
+	private Player player = null;
+	
+	public Camera(Game game) {
+		this.game = game;
+		this.x = 0;
+		this.y = 0;
+	}
+	
+	
+	public void tick() {
+		if(player != null) {
+			x = player.getX() - (Game.WIDTH - 46) / 2;
+			y = player.getY()- (Game.HEIGHT - 68) / 2;
+			
+			//System.out.println("x: " + x + ", y: " + y + ", minX: " + player.getMinPlayerX() + ", maxX: " + player.getMaxPlayerX() + ", minY: " + player.getMinPlayerY() + ", maxY: " + player.getMaxPlayerY());
+			
+			x = Game.clamp(x, player.getMinPlayerX() + Game.WIDTH / 2, player.getMaxPlayerX() - Game.WIDTH - 23);
+			y = Game.clamp(y, player.getMinPlayerY() + Game.HEIGHT / 2, player.getMaxPlayerY() - Game.HEIGHT - 34);
+			
+		} else
+			player = game.getHandler().getPlayer();
+	}
+	
+	public double getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public double getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+}
