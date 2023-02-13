@@ -22,6 +22,12 @@ public class Vector{
 		this.z = z;
 	}
 	
+	public Vector(double angle) {
+		this.x = Math.cos(angle);
+		this.y = Math.sin(angle);
+		this.z = 0;
+	}
+	
 	public void clamp(double maxMagnitude) {
 		if(magnitude() <= maxMagnitude) return;
 		
@@ -99,5 +105,11 @@ public class Vector{
 	
 	public double getZComponent() {
 		return z;
+	}
+	
+	public void subtract(Vector b) {
+		setXComponent(getXComponent() - b.getXComponent());
+		setYComponent(getYComponent() - b.getYComponent());
+		setZComponent(getZComponent() - b.getZComponent());
 	}
 }

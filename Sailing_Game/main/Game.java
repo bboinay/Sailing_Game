@@ -6,16 +6,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.swing.JFrame;
@@ -24,12 +17,9 @@ public class Game extends Canvas implements Runnable{
 
 	private static final long serialVersionUID = -3885519666922197636L;
 	public static int WIDTH = (int)(800*1), HEIGHT = (int)(608*1);
-	public static float MAINVOL = 0.2f;
+	public static int MIDSCREENX = (WIDTH - 46) / 2, MIDSCREENY = (HEIGHT - 68) / 2; 
 	public Window window;
-	public String title = "Zombie Game";
-	
-	private boolean demoMap = false;
-	private boolean demo = false;
+	public String title = "Sailing Game";
 	
 	private Thread thread;
 	private boolean isRunning = false;
@@ -41,7 +31,7 @@ public class Game extends Canvas implements Runnable{
 	public Camera getCamera() {return cam;}
 	private HUD hud;
 	public HUD getHud() {return hud;}
-
+	
 	private KeyInput kInput;
 	public KeyInput getKeyInput() {return kInput;}
 	private MouseInput mInput;
@@ -53,12 +43,9 @@ public class Game extends Canvas implements Runnable{
 	public int centerY = HEIGHT / 2;
 	
 	
-	private BufferedImage baseMap = null;
-	public BufferedImage getBaseMap() { return baseMap;	}
+	public STATE gameState = STATE.Game;
 	
-	public STATE gameState = STATE.Menu;
-	
-	Point3D playerOrigin = new Point3D(0, -200);
+	Point3D playerOrigin = new Point3D(MIDSCREENX, MIDSCREENY);
 	
 	public static void main(String args[]) {
 		new Game();
@@ -184,18 +171,13 @@ public class Game extends Canvas implements Runnable{
 	public void renderGame(Graphics g) {
 		Graphics2D g2d = (Graphics2D)g;
 		
-		g2d.translate(-cam.getX(),  -cam.getY());
+		//g2d.translate(-cam.getX(),  -cam.getY());
 		
-		g2d.drawImage(mapHandler.getBaseMap(), -mapHandler.getBaseMap().getWidth() / 2, -mapHandler.getBaseMap().getHeight() / 2, this);
+		g.setColor(Color.blue);
+		g2d.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 		handler.render(g);
-		g2d.drawImage(mapHandler.getTopMap(), -mapHandler.getBaseMap().getWidth() / 2, -mapHandler.getBaseMap().getHeight() / 2, this);
 		
-		/*
-		mcl.renderBase(g, this);
-		handler.render(g);
-		mcl.renderTop(g, this);
-		*/
-		g2d.translate(cam.getX(),  cam.getY());
+		//g2d.translate(cam.getX(),  cam.getY());
 	}
 
 	public void updateMouseLocation() {
@@ -212,8 +194,23 @@ public class Game extends Canvas implements Runnable{
 		System.out.println("mouseX: " + mouseX + ", mouseY: " + mouseY);
 	}
 	
-	public void testPrintDevMode() {
-		System.out.println("DevMode: " + isDevMode());
+	
+	
+	public STATE getState() {return gameState;}
+	public void setState(STATE s) {gameState = s;}
+	
+	public int getMouseX() {return mouseX;}
+	public int getMouseY() {return mouseY;}
+	
+	public int getScreenMouseX() {return screenMouseX;}
+	public int getScreenMouseY() {return screenMouseY;}
+	
+	public JFrame getWindowFrame() {
+		return window.getFrame();
+	}
+	
+	public Point3D getPlayerOrigin() {
+		return playerOrigin;
 	}
 	
 	public static double clamp(double num, double min, double max) {
@@ -255,28 +252,6 @@ public class Game extends Canvas implements Runnable{
 		g.fillRect((int)x + lineThickness, (int)y + lineThickness, (int)width - 2 * lineThickness, (int)height - 2 * lineThickness);
 	}
 	
-	public static LinkedList<String> wrap(String s, int wrapSize){
-		String currLine = "";
-		LinkedList<String> ans = new LinkedList<String>();
-		while(s.indexOf(" ") != -1) {
-			String nextWord = s.substring(0, s.indexOf(" ") + 1);
-			s = s.substring(s.indexOf(" ") + 1);
-			if(currLine.length() + nextWord.length() <= wrapSize) {
-				currLine += nextWord;
-			} else {
-				ans.add(currLine);
-				currLine = nextWord;
-			}
-		}
-		if(currLine.length() + s.length() <= wrapSize) {
-			ans.add(currLine + s);
-		} else {
-			ans.add(currLine);
-			ans.add(s);
-		}
-		return ans;
-	}
-	
 	public static void printArray(int[] arr) {
 		System.out.print("[");
 		for(int i = 0; i < arr.length - 1; i++) {
@@ -293,23 +268,6 @@ public class Game extends Canvas implements Runnable{
 		System.out.println(arr[arr.length - 1] + "]");
 	}
 	
-	public STATE getState() {return gameState;}
-	public void setState(STATE s) {gameState = s;}
-	
-	public int getMouseX() {return mouseX;}
-	public int getMouseY() {return mouseY;}
-	
-	public int getScreenMouseX() {return screenMouseX;}
-	public int getScreenMouseY() {return screenMouseY;}
-	
-	public JFrame getWindowFrame() {
-		return window.getFrame();
-	}
-	
-	public Point3D getPlayerOrigin() {
-		return playerOrigin;
-	}
-	
 	public boolean mouseOver(int mx, int my, int x, int y, int width, int height) {
 		if (mx > x && mx < x + width) {
 			if (my > y && my < y + height) {
@@ -318,39 +276,21 @@ public class Game extends Canvas implements Runnable{
 		}
 		return false;
 	}
-
-	public boolean isDemo() { 
-		return demo; 
-	}
 	
-	public void setDemo(boolean demo) {
-		this.demo = demo;
-	}
-	
-	public void setDevMode(boolean devMode) {
-		demo = !devMode;
-	}
-	
-	public boolean isDevMode() {
-		return !demo;
-	}
-	
-	private class Listener implements AWTEventListener {
-        public void eventDispatched(AWTEvent event) {
-            //System.out.print(MouseInfo.getPointerInfo().getLocation() + " | ");
-            //System.out.println(event);
-        	if(event.getID() == 505 || event.getID() == 1005) {
-        		if(gameState == STATE.Game) {
-        			gameState = STATE.Shop;
-        		}
-        	}
-        }
-    }
-	
-	public void testPlayerInteractRangeAndCustomHitbox() {
-		Player player = handler.getPlayer();
-		System.out.println("player.interactRange() = " + player.interactRange());
-		System.out.println("currentHitbox().getName() = " + player.getCurrHitbox().getName());
+	public static Vector projectAOnB(Vector a, Vector b) {
+		Vector unitB = b;
+		unitB.multiplyAllComponentsBy(b.magnitude());
 		
+		double angleDifference = a.get2DDirection() - b.get2DDirection();
+		Vector ans = unitB;
+		ans.multiplyAllComponentsBy(a.magnitude() * Math.cos(angleDifference));
+		return ans;
+	}
+	
+	public static Vector rejectAOnB(Vector a, Vector b) {
+		Vector projAOnB = projectAOnB(a, b);
+		Vector ans = a;
+		ans.subtract(projAOnB);
+		return ans;
 	}
 }

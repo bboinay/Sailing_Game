@@ -1,0 +1,100 @@
+package main;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+public class Ship extends GameObject{
+
+	public double health, maxHealth;
+	public double rudderLocation = 0; //-100 full left, +100 full right
+	public double minRudderLocation = -100;
+	public double maxRudderLocation = 100;
+	public double rudderSpeed = .5; //how quickly rudderLocation increases or decreases
+	
+	public double windInSails = 0;
+	public double maxWindInSails = 100;
+	public double windInSailsIncrement = 2;
+	
+	public double radialVelocity;
+	public double maxRadialVelocity = .001;
+
+	public double heading;
+	public double directionOfMovement;
+	
+	public double radialDrag;
+	public double straightLineDrag;
+	
+	
+	public Ship(Point3D location) {
+		super(location);
+	}
+
+	public void tick() {}
+	
+	public void shipMove() {
+		setTurnRateFromRudderPosition();
+		turn();
+		move();
+	}
+	
+	public void setTurnRateFromRudderPosition() {
+		radialVelocity = rudderLocation / maxRudderLocation * maxRadialVelocity;
+	}
+	
+	public void rudderLeft() {
+		rudderLocation -= rudderSpeed;
+		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+	}
+	
+	public void rudderRight() {
+		rudderLocation += rudderSpeed;
+		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+	}
+	
+	public void turn() {
+		heading += radialVelocity;
+	}
+	
+	public void decreaseWind() {
+		windInSails -= windInSailsIncrement;
+		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+	
+	public void increaseWind() {
+		windInSails += windInSailsIncrement;
+		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+	
+	public void render(Graphics g) {
+		Graphics2D g2d = (Graphics2D)g;
+		
+		g2d.rotate(heading, getCenterX(), getCenterY());
+		g.setColor(Color.black);
+		g.fillRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
+		g2d.rotate(-heading, getCenterX(), getCenterY());
+	}
+	
+	public void printShipInformation() {
+		System.out.println("Heading: " + heading + ", directionOfMovement: " + directionOfMovement);
+		System.out.println("rudderLocation: " + rudderLocation + ", windInSails: " + windInSails);
+		System.out.println("radialVelocity: " + radialVelocity);
+		System.out.println("radialDrag: " + radialDrag + ", straightLineDrag: " + straightLineDrag);
+	}
+
+	//HEALTH
+	public void decreaseHealthBy(double damage) {
+		health -= damage;
+		clampHealth();
+	}
+	
+	public void clampHealth() {
+		health = Game.clamp(health, 0, maxHealth);
+	}
+	
+	public double 	getHealth() {return Game.clamp(health, 0, maxHealth);}
+	public void 	setHealth(double d) {health = d;}
+	
+	public double 	getMaxHealth() {return maxHealth;}
+	public void 	setMaxHealth(double d) {maxHealth = d;}
+}

@@ -1,0 +1,40 @@
+package com.main;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+public class SpriteLoader {
+
+	
+	public SpriteLoader() {
+		
+	}
+	
+	public BufferedImage[][] loadSprites(String path, int rMin, int rMax, int cMin, int cMax, int width, int height){
+		
+		
+		BufferedImage spriteSheet = null;
+		
+		BufferedImage[][] ans = new BufferedImage[rMax - rMin + 1][cMax - cMin + 1];
+		
+		if(path == null)
+			return ans;
+		
+		BufferedImageLoader loader = new BufferedImageLoader();
+		try {
+			spriteSheet = loader.loadImage(path);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		SpriteSheet ss = new SpriteSheet(spriteSheet);
+		
+		for(int r = 0; r < ans.length; r++) {
+			for(int c = 0; c < ans[0].length; c++) {
+				ans[r][c] = ss.grabImage( cMin + c, rMin + r, width, height);
+			}
+		}
+		
+		return ans;
+	}
+}

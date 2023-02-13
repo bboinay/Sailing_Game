@@ -1,4 +1,4 @@
-package com.main;
+package main;
 
 import java.awt.Graphics;
 import java.util.LinkedList;
@@ -9,9 +9,6 @@ public class Handler {
 	private Game game;
 	private Player player;
 	private double renderDistance = Game.WIDTH * 1.2f;
-	
-	public int zombieCount = 0;
-	public int zombiesKilled = 0;
 	
 	public Handler(Game game) {
 		this.game = game;
@@ -46,7 +43,8 @@ public class Handler {
 	public void clearHandlerExceptForOneNewPlayer() {
 		object.clear();
 		System.out.println(object.size());
-		addObject(new Player(game.getPlayerOrigin(), game));
+		player = new Player(game.getPlayerOrigin(), game);
+		addObject(player);
 	}
 	
 	public void render(Graphics g) {
@@ -72,7 +70,6 @@ public class Handler {
 	
 	public void removeObject(GameObject obj) {
 		if(obj == null) return;
-		if(obj.getId() == ID.Zombie)zombiesKilled++; 
 		object.remove(obj);
 	}
 	
@@ -88,41 +85,9 @@ public class Handler {
 	}
 	
 	public void removeAllNonPlayerObjects() {
-		removeAllZombies();
 		for(int i = object.size() - 1; i >= 0; i--) {
 			GameObject temp = object.get(i);
 			if(temp.id != ID.Player)
-				object.remove(i);
-		}
-	}
-	
-	public void removeAllZombies() {
-		while(hasZombies()) 
-			removeZombiesSinglePass();
-	}
-	
-	public boolean hasZombies() {
-		for(int i = 0; i < object.size(); i++) {
-			GameObject temp = object.get(i);
-			if(temp.id == ID.Zombie)
-				return true;
-		}
-		return false;
-	}
-	
-	public int countZombies() {
-		int ans = 0;
-		for(int i = 0; i < object.size(); i++) {
-			GameObject temp = object.get(i);
-			if(temp.id == ID.Zombie)
-				ans++;
-		}
-		return ans;
-	}
-	
-	public void removeZombiesSinglePass() {
-		for(int i = object.size() - 1; i >= 0; i--) {
-			if(object.get(i).getId() == ID.Zombie)
 				object.remove(i);
 		}
 	}

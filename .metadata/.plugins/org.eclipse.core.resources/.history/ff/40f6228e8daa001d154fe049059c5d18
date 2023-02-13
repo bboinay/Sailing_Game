@@ -1,0 +1,131 @@
+package main;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+public class Ship extends GameObject{
+
+	public double rudderLocation = 0; //-100 full left, +100 full right
+	public double minRudderLocation = -100;
+	public double maxRudderLocation = 100;
+	public double rudderSpeed = .5; //how quickly rudderLocation increases or decreases
+	
+	public double windInSails = 0;
+	public double maxWindInSails = 100;
+	public double windInSailsIncrement = 2;
+	
+	public double radialVelocity;
+	public double maxRadialVelocity = .01;
+
+	public double radialAcceleration = 0;
+	public double maxRadialAcceleration = .00001;
+	
+	public double maxVelocity = .1;
+	public double maxAcceleration = maxVelocity / 2000;
+	public double accelerationIncrement; //scaled by windInSails, capped by +/- maxAcceleration
+	
+	public double heading;
+	public double directionOfMovement;
+	
+	public double radialDrag;
+	public double straightLineDrag;
+	
+	
+	public Ship(Point3D location) {
+		super(location);
+		maxVelocity = 12;
+	}
+
+	public void tick() {
+		
+	}
+	
+	public void clampMovement() {
+		radialAcceleration = Game.clamp(radialAcceleration, -maxRadialAcceleration, maxRadialAcceleration);
+		radialVelocity = Game.clamp(radialVelocity, -maxRadialVelocity, maxRadialVelocity);
+		acceleration.clamp(maxAcceleration);
+		velocity.clamp(maxVelocity);
+		
+		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+	}
+	
+	public void shipMove() {
+		clampMovement();
+		radialAcceleration = maxRadialAcceleration * rudderLocation / maxRudderLocation;
+		accelerationIncrement = maxAcceleration * windInSails / maxWindInSails;
+		
+		turn();
+		incrementAccelerationAtAngle(accelerationIncrement, heading);
+		move();
+		clampMovement();
+	}
+	
+	public void turn() {
+		applyTurnDrag();
+		//Game.clamp(radialAcceleration, radialAcceleration, maxRadialAcceleration);
+		radialVelocity += radialAcceleration;
+		//Game.clamp(radialVelocity, radialVelocity, maxRadialVelocity);
+		heading += radialVelocity;
+	}
+	
+	public void applyStraightLineDrag() {
+		double drag = Math.pow(velocity.magnitude(), 2) * .05;
+		incrementAccelerationAtAngle(-drag, heading);
+	}
+	
+	public void applyTurnDrag() {
+		radialDrag = Math.pow(radialVelocity, 2) * .05;
+		
+		if(radialVelocity >= 0)
+			radialDrag *= -1;
+		
+		radialAcceleration += radialDrag;
+		
+	}
+	
+	//adds accelerationIncrement to current heading
+	public void incrementAccelerationAtAngle(double increment, double angle) {
+		acceleration.addToXComponent(accelerationIncrement * Math.cos(angle));
+		acceleration.addToYComponent(accelerationIncrement * Math.sin(angle));
+		
+		acceleration.clamp(maxAcceleration);
+	}
+	
+	public void rudderLeft() {
+		rudderLocation -= rudderSpeed;
+		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+	}
+	
+	public void rudderRight() {
+		rudderLocation += rudderSpeed;
+		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+	}
+	
+	public void decreaseWind() {
+		windInSails -= windInSailsIncrement;
+		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+	
+	public void increaseWind() {
+		windInSails += windInSailsIncrement;
+		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+	
+	public void render(Graphics g) {
+		Graphics2D g2d = (Graphics2D)g;
+		
+		g2d.rotate(heading, getCenterX(), getCenterY());
+		g.setColor(Color.black);
+		g.fillRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
+		g2d.rotate(-heading, getCenterX(), getCenterY());
+	}
+	
+	public void printShipInformation() {
+		System.out.println("Heading: " + heading + ", directionOfMovement: " + directionOfMovement);
+		System.out.println("rudderLocation: " + rudderLocation + ", windInSails: " + windInSails);
+		System.out.println("radialVelocity: " + radialVelocity + ", radialAcceleration: " + radialAcceleration);
+		System.out.println("radialDrag: " + radialDrag + ", straightLineDrag: " + straightLineDrag);
+	}
+
+}

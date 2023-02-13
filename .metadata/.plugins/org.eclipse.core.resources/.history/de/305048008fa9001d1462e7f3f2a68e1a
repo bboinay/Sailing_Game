@@ -1,0 +1,186 @@
+package main;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+
+public class Player extends GameObject{
+
+	public int maxPlayerRenderHeight = Game.HEIGHT - 68;
+	public int maxPlayerRenderWidth = Game.WIDTH - 46;
+	
+	public boolean dead = false;
+	public double lastStepX, lastStepY;
+	public int stepSwitch = 1;
+	public double stepDistance = 45;
+	
+	public double originalMaxVelocity = 1.0f;
+	public double sprintVelocity = 1.6f;
+	public double originalSprintVelocity = sprintVelocity;
+	
+	public double originalMaxAcceleration = .04f;
+	public double sprintAcceleration = .07f;
+	
+	public double maxDeceleration = 0.1f;
+	public double brakeFactor = 0.94f;
+	
+	public double biteDamage = 40;
+	
+	public double minStamina = -20f;
+	public double maxStamina = 100f;
+	public double swingStamina = 20f;
+	public double stamina = maxStamina;
+	public double staminaDrain = .3f;
+	public double staminaRefill = .1f;
+
+	private double ogCashPerZombie = 38.25;
+	private double cashEarnedPerZombie = ogCashPerZombie;
+	
+	
+	private int shotsFired = 0;
+	private int shotsMissed = 0;
+	
+	private double flakResistance = 0;
+	
+	//value from 0 to 1, 1 being most stable and 0 being least
+	public double shootingStability = 1f;
+	public int timeTilFocused = 50;
+	public int timeStill = 0;
+	public double aimConeMod = 1; 
+	private double headshotDamage;
+	private double maxHeadShotDamage = 400;
+	private boolean headshotsAllowed = false;
+	
+	private double reloadMaxVelocity = 0.35f;
+	private int bulletsInInventory = 18;
+	private boolean reloadingSingles = false;
+	private boolean reloadingClip = false;
+	private boolean reloadingClipLastTick = false;
+	private double reloadTimeWeight = 1;
+	private int reloadTimer = 0;
+	private boolean canReloadFullClips = false;
+	private boolean reloadSoundPlayed = false;
+	
+	private int swingRange = 40;
+	private int swingSize = 11;
+	private boolean swinging = false;
+	private boolean lastTickSwinging = swinging;
+	
+	private float fragSpawnChance = 0.30f;
+	private int ammoPickupAmount = 28;
+	public int fragsInInv = 10;
+	private double fragZombieDamagePerVel = 4;
+	
+	public boolean[] gunsBought = {false, false, false, false};
+								//	 SMG  shotgun   AR    axe
+	private boolean SMGUnlocked() { return gunsBought[0]; }
+	private boolean shotgunUnlocked() { return gunsBought[1]; }
+	private boolean ARUnlocked() { return gunsBought[2]; }
+	private boolean axeUnlocked() { return gunsBought[3]; }
+	
+	public boolean pinPulled = false;
+	public int pinTime = 25;
+	public int pinTimer = 0;
+	
+	private boolean triggerPulled = false;
+	
+	//upgrades?
+	private boolean boxButton = true;
+	private boolean placeBoxMode = false;
+	private boolean hasLaserSight = true;
+	
+	private double directionInRadians;
+	
+	int minPlayerX, maxPlayerX, minPlayerY, maxPlayerY;
+	
+	private KeyInput kInput;
+	private MouseInput mInput;
+	private Handler handler;
+	private Camera cam;
+	private Game game;
+	private SpriteLoader sl;
+	
+	public BufferedImage[][] spriteSheet;
+	public BufferedImage walkingSprite, pistolSprite, fragSprite, SMGSprite, shotgunSprite, ARSprite, axeSprite, axeDownSprite;
+	
+	//shop storage could be optimized a lot i think but thats for another day
+	
+	public double priority = 200;
+	
+	public Player(Point3D origin, Game game) {
+		super(origin);
+		setId(ID.Player);
+		
+		width = 32;
+		height = 64;
+		health = 1000f;
+		maxHealth = health;
+		
+		turnSpeed = .02;
+		
+		this.game = game;
+		handler = game.getHandler();
+		kInput = game.getKeyInput();
+
+		setUpPlayerSprites();
+		
+	}
+	
+	public void setUpPlayerSprites(){
+		sl = new SpriteLoader();
+		/*spriteSheet = sl.loadSprites("/player_sprites_32x48.png", 1, 1, 1, 8, 32, 48);
+		walkingSprite = spriteSheet[0][0];
+		fragSprite = spriteSheet[0][2];
+		axeDownSprite = spriteSheet[0][7];*/
+	}
+	
+	
+	
+	public void render(Graphics g) {
+		renderPlayerCharacter(g);
+	}
+	
+	public void tick() {
+		turn();
+		updateVelocityWithClampedAcceleration();
+		updatePositionWithClampedVelocity();
+		
+		keyInputCheck();
+	}
+	
+	public void turn() {
+		directionInRadians += changeInDirectionInRadians;
+	}
+	
+	public void keyInputCheck() {
+		if(kInput.keyA)
+			changeInDirectionInRadians = -turnSpeed;
+		else if(kInput.keyD)
+			changeInDirectionInRadians = +turnSpeed;
+		else 
+			changeInDirectionInRadians *= .9;
+			
+		
+		System.out.println(directionInRadians);
+	}
+		
+	
+	public int 	getMinPlayerX() {return minPlayerX;}
+	public void setMinPlayerX(int x) {minPlayerX = x;}
+
+	public int 	getMaxPlayerX() {return maxPlayerX;}
+	public void setMaxPlayerX(int x) {maxPlayerX = x;}
+	
+	public void renderPlayerCharacter(Graphics g) {
+		Graphics2D g2d = (Graphics2D)g;
+		
+		g2d.rotate(directionInRadians, getX() + width / 2, getY() + height / 2);
+		g.setColor(Color.black);
+		g.fillRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
+		g2d.rotate(-directionInRadians, getX() + width / 2, getY() + height / 2);
+	}
+}

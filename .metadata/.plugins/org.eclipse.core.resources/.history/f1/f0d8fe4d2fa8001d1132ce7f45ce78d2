@@ -1,0 +1,201 @@
+package com.main;
+
+public class PlayerUpgradeManager {
+
+	public Player player;
+	public int[] upgradesBought; 
+	
+	public PlayerUpgradeManager(Player player) {
+		this.player = player;
+		setUpBlankUpgradesArray();
+	}
+	
+	public void setUpBlankUpgradesArray() {
+		upgradesBought = new int[player.getShopSize()];
+		setArrayToZeros(upgradesBought);
+	}
+
+	public void setArrayToZeros(int[] array) {
+		for(int i = 0; i < array.length; i++) {
+			array[i] = 0;
+		}
+	}
+	
+	//changes player to match upgrades; does not account for cost
+	public void upgrade(int id) {
+		switch(id) {
+			case 0:
+				player.getPistol().setMagazineSize(11);
+				break;
+			case 1: 
+				increaseMovementSpeed();
+				break;
+			case 2: 
+				increaseReloadTime();
+				break;
+			case 3: 
+				increaseReloadMovementSpeed();
+				break;
+			case 4: 
+				//nothing for big feet
+				break;
+			case 5: 
+				increaseMaxStamina();
+				
+				break;
+			case 6: 
+				increaseCashEarnedPerZombie();
+				
+				break;
+			case 7: 
+				increaseAmmoPickupCapacity();
+				
+				break;
+			case 8: 
+				increaseFlakResistance();
+				
+				break;
+			case 9:
+				decreaseAimCone();
+				
+				break;
+			case 10:
+				purchaseSMG();
+				
+				break;
+			case 11:
+				allowClipReloads();
+				
+				break;
+			case 12:
+				purchaseShotgun();
+				
+				break;
+			case 13:
+				purchaseAR();
+				
+				break;
+			case 14:
+				purchaseAxe();
+				
+				break;
+			case 15:
+				decreaseStaminaPerSwing();
+				
+				break;
+			case 16:
+				increaseDamageDoneByFrags();
+				
+				break;
+			case 17:
+				increaseShotgunSpread();
+				
+				break;
+			case 18:
+				increasePenetrationDecreaseDamageOfShotgun();
+				
+				break;
+			case 19:
+				allowHeadshots();
+				
+				break;
+			case 20:
+				enableBoxButton();
+				
+				break;
+			case 21:
+				enableLaserSight();
+				
+				break;
+		}
+		upgradesBought[id] = 1;
+		//Shop.updateShopFromSave();
+	}
+	
+	public void increaseMovementSpeed() {
+		player.multiplyOriginalMaxVelocityBy(1.05);
+		player.multiplyMaxVelocityBy(1.05);
+		player.multiplySprintVelocityBy(1.05);
+		player.multiplyOriginalSprintVelocityBy(1.05);
+		player.multiplyReloadMaxVelocityBy(1.05);
+	}
+	
+	public void increaseReloadTime() {
+		player.setReloadTimeWeight(.8);
+	}
+	
+	public void increaseReloadMovementSpeed() {
+		player.multiplyReloadMaxVelocityBy(1.3);
+	}
+	
+	public void increaseMaxStamina() {
+		player.multiplyMaxStaminaBy(1.3);
+	}
+	
+	public void increaseCashEarnedPerZombie() {
+		player.multiplyCashEarnedPerZombieBy(2.5);
+	}
+	
+	public void increaseAmmoPickupCapacity() {
+		player.setFragSpawnChance(.55f);
+		player.setAmmoPickupAmount(35);
+	}
+	
+	public void increaseFlakResistance() {
+		player.setFlakResistance(.8);
+	}
+	
+	public void decreaseAimCone() {
+		player.setAimConeMod(.75);
+	}
+	
+	public void purchaseSMG() {
+		player.gunsBought[0] = true;
+	}
+	
+	public void allowClipReloads() {
+		player.allowClipReloads();
+	}
+	
+	public void purchaseShotgun() {
+		player.gunsBought[1] = true;
+	}
+	
+	public void purchaseAR() {
+		player.gunsBought[2] = true;
+	}
+	
+	public void purchaseAxe() {
+		player.gunsBought[3] = true;
+	}
+	
+	public void decreaseStaminaPerSwing() {
+		player.setSwingStamina(16);
+	}
+	
+	public void increaseDamageDoneByFrags() {
+		player.setFragZombieDamagePerVel(3);
+	}
+	
+	public void increaseShotgunSpread() {
+		player.getShotgun().setAimCone(45);
+	}
+	
+	public void increasePenetrationDecreaseDamageOfShotgun() {
+		Buckshot.velSlowdown = .78;
+		Buckshot.zombieDamagePerVel = 1.3;
+	}
+	
+	public void allowHeadshots() {
+		player.allowHeadshots();
+	}
+	
+	public void enableBoxButton() {
+		player.enableBoxButton();
+	}
+	
+	public void enableLaserSight() {
+		player.enableLaserSight();
+	}
+	
+}

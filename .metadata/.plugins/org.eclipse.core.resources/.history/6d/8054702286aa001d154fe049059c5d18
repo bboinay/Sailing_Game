@@ -1,0 +1,28 @@
+package main;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+public class Ship extends GameObject{
+
+	
+	
+	public Ship(Point3D location) {
+		super(location);
+	}
+
+	public void tick() {
+		
+	}
+
+	public void render(Graphics g) {
+		Graphics2D g2d = (Graphics2D)g;
+		
+		g2d.rotate(directionInRadians, getCenterX(), getCenterY());
+		g.setColor(Color.black);
+		g.fillRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
+		g2d.rotate(-directionInRadians, getCenterX(), getCenterY());
+	}
+
+}
