@@ -41,6 +41,15 @@ public class Ship extends GameObject{
 		
 		maxAcceleration = .01;
 		maxVelocity = .2;
+		
+		/*
+		Vector test = new Vector(2, 3, 6);
+		test.print();
+		System.out.println("length is: " + test.magnitude() + ", direction is: " + test.get2DDirection());
+		test.setMagnitude(8.1818);
+		test.print();
+		System.out.println("length is: " + test.magnitude() + ", direction is (+1.2) " + test.get2DDirection());
+		*/
 	}
 
 	public void tick() {
@@ -51,9 +60,34 @@ public class Ship extends GameObject{
 		printShipInformation();
 		
 		//clampMovement();
-		shipMove();
+		
+		turn();
+		advance();
 	}
 	
+	public void turn() {
+		setTurnRateFromRudderPosition();
+		heading += radialVelocity;
+		velocity.turn(radialVelocity);
+	}
+	
+	public void setTurnRateFromRudderPosition() {
+		radialVelocity = rudderLocation / maxRudderLocation * maxRadialVelocity;
+	}
+	
+	public void advance() {
+		setVelocityFromWindInSails();
+		location = velocity.movePoint(location);
+	}
+	
+	public void setVelocityFromWindInSails() {
+		double newVelocityMag = windInSails / maxWindInSails * maxVelocity;
+		if(velocity.magnitude() == 0) {
+			velocity = new Vector(heading, newVelocityMag);
+		} else
+			velocity.setMagnitude(windInSails / maxWindInSails * maxVelocity);
+	}
+
 	public void keyInputCheck() {
 		if(kInput.keyA && !kInput.keyD)
 			rudderLeft();
@@ -61,22 +95,9 @@ public class Ship extends GameObject{
 			rudderRight();
 		
 		if(kInput.keyW && !kInput.keyS)
-			accelerateInDirection(maxAcceleration, heading);
-		else if(!kInput.keyW && kInput.keyS)
-			decreaseWind();
-			
-			
-	}
-	
-	public void shipMove() {
-		setTurnRateFromRudderPosition();
-		turn();
-		//calculateDrag();
-		move();
-	}
-	
-	public void setTurnRateFromRudderPosition() {
-		radialVelocity = rudderLocation / maxRudderLocation * maxRadialVelocity;
+			increaseWind();
+		//else 
+			//decreaseWind();
 	}
 	
 	public void rudderLeft() {
@@ -89,32 +110,6 @@ public class Ship extends GameObject{
 		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
 	}
 	
-	public void turn() {
-		heading += radialVelocity;
-	}
-	
-	public void calculateDrag() {
-		movementDirection = velocity.get2DDirection();
-		
-		double redirectDragCoefficient = .1;
-		Vector dragVector = Game.rejectAOnB(velocity, new Vector(heading - movementDirection));
-		
-		System.out.println("----------");
-		System.out.println("drag vector:");
-		dragVector.print();
-		dragVector.multiplyAllComponentsBy(redirectDragCoefficient);
-		dragVector.print();
-		
-		System.out.println("velocity before drag:");
-		velocity.print();
-		
-		velocity.subtract(dragVector);
-		
-		System.out.println("velocity after drag:");
-		velocity.print();
-		System.out.println("----------");
-	}
-	
 	public void decreaseWind() {
 		windInSails -= windInSailsIncrement;
 		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
@@ -123,6 +118,10 @@ public class Ship extends GameObject{
 	public void increaseWind() {
 		windInSails += windInSailsIncrement;
 		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+
+	public void calculateDrag() {
+		movementDirection = velocity.get2DDirection();
 	}
 	
 	public void clampMovement() {

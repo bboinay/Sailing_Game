@@ -10,16 +10,10 @@ public class Vector{
 		this.z = 0;
 	}
 	
-	public Vector(double x, double y) {
-		this.x = x;
-		this.y = y;
-		this.z = 0;
-	}
-	
-	public Vector(double x, double y, double z) {
-		this.x = x; 
-		this.y = y;
-		this.z = z;
+	public Vector(Point3D p) {
+		this.x = p.getX(); 
+		this.y = p.getY();
+		this.z = p.getZ();
 	}
 	
 	public Vector(double angle) {
@@ -27,6 +21,13 @@ public class Vector{
 		this.y = Math.sin(angle);
 		this.z = 0;
 	}
+	
+	public Vector(double angle, double mag) {
+		this.x = mag * Math.cos(angle);
+		this.y = mag * Math.sin(angle);
+		this.z = 0;
+	}
+	
 	
 	public void clamp(double maxMagnitude) {
 		if(magnitude() <= maxMagnitude) return;
@@ -107,9 +108,60 @@ public class Vector{
 		return z;
 	}
 	
-	public void subtract(Vector b) {
-		setXComponent(getXComponent() - b.getXComponent());
-		setYComponent(getYComponent() - b.getYComponent());
-		setZComponent(getZComponent() - b.getZComponent());
+	public void setMagnitude(double d) {
+		if(magnitude() == 0) return;
+		multiplyAllComponentsBy(d / magnitude());
 	}
+	
+	public void increaseMagnitude(double d) {
+		setMagnitude(magnitude() + d);
+	}
+	
+	public void decreaseMagnitude(double d) {
+		setMagnitude(magnitude() - d);
+	}
+	
+	public void turn(double angle) {
+		double newAngle = this.get2DDirection() + angle;
+		Vector newVector = new Vector(newAngle);
+		newVector.setMagnitude(Math.sqrt(x * x + y * y));
+		setXComponent(newVector.getXComponent());
+		setYComponent(newVector.getYComponent());
+	}
+	
+	public void subtractVector(Vector v) {
+		setXComponent(getXComponent() - v.getXComponent());
+		setYComponent(getYComponent() - v.getYComponent());
+		setZComponent(getZComponent() - v.getZComponent());
+	}
+	
+	public void addVector(Vector v) {
+		setXComponent(getXComponent() + v.getXComponent());
+		setYComponent(getYComponent() + v.getYComponent());
+		setZComponent(getZComponent() + v.getZComponent());
+	}
+	
+	public Point3D movePoint(Point3D p) {
+		return new Point3D(p.getX() + x, p.getY() + y, p.getZ() + z);
+	}
+	
+	/*
+	public Vector projectAOnB(Vector a, Vector b) {
+		Vector unitB = b;
+		unitB.multiplyAllComponentsBy(b.magnitude());
+		
+		double angleDifference = a.get2DDirection() - b.get2DDirection();
+		Vector ans = unitB;
+		ans.multiplyAllComponentsBy(a.magnitude() * Math.cos(angleDifference));
+		return ans;
+	}
+	
+	public Vector rejectAOnB(Vector a, Vector b) {
+		Vector projAOnB = projectAOnB(a, b);
+		Vector ans = a;
+		ans.subtract(projAOnB);
+		return ans;
+	}
+	*/
+	 
 }

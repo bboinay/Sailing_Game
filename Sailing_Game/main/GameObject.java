@@ -33,7 +33,7 @@ public abstract class GameObject {
 	public abstract void render(Graphics g);
 		
 	//VECTOR UPDATE METHODS
-	public void move() {
+	public void moveXY() {
 		updateVelocityWithAcceleration();
 		updatePositionWithVelocity();
 	}

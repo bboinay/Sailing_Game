@@ -277,20 +277,5 @@ public class Game extends Canvas implements Runnable{
 		return false;
 	}
 	
-	public static Vector projectAOnB(Vector a, Vector b) {
-		Vector unitB = b;
-		unitB.multiplyAllComponentsBy(b.magnitude());
-		
-		double angleDifference = a.get2DDirection() - b.get2DDirection();
-		Vector ans = unitB;
-		ans.multiplyAllComponentsBy(a.magnitude() * Math.cos(angleDifference));
-		return ans;
-	}
 	
-	public static Vector rejectAOnB(Vector a, Vector b) {
-		Vector projAOnB = projectAOnB(a, b);
-		Vector ans = a;
-		ans.subtract(projAOnB);
-		return ans;
-	}
 }

@@ -1,0 +1,169 @@
+package main;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+public class Ship extends GameObject{
+	
+	public boolean selected = true;
+
+	public double health, maxHealth;
+	public double rudderLocation = 0; //-100 full left, +100 full right
+	public double minRudderLocation = -100;
+	public double maxRudderLocation = 100;
+	public double rudderSpeed = .5; //how quickly rudderLocation increases or decreases
+	
+	public double windInSails = 0;
+	public double maxWindInSails = 100;
+	public double windInSailsIncrement = 2;
+	
+	public double radialVelocity;
+	public double maxRadialVelocity = .005;
+
+	public double heading;
+	public double movementDirection;
+	
+	public double radialDrag;
+	public double straightLineDrag;
+	
+	public KeyInput kInput;
+	public MouseInput mInput;
+	
+	public Ship(Point3D location, Game game) {
+		super(location);
+		
+		width = 64;
+		height = 32;
+		
+		kInput = game.getKeyInput();
+		mInput = game.getMouseInput();
+		
+		maxAcceleration = .01;
+		maxVelocity = .2;
+		
+		Vector test = new Vector(2, 3);
+		System.out.println("length is: " + test.magnitude() + ", direction is: " + test.get2DDirection());
+		test.turn(1.2);
+		System.out.println("length is: " + test.magnitude() + ", direction is (+1.2) " + test.get2DDirection());
+		
+	}
+
+	public void tick() {
+		if(!selected) return;
+		
+		keyInputCheck();
+		//printGameObjectVectors();
+		//printShipInformation();
+		
+		//clampMovement();
+		shipMove();
+	}
+	
+	public void keyInputCheck() {
+		if(kInput.keyA && !kInput.keyD)
+			rudderLeft();
+		else if(!kInput.keyA && kInput.keyD)
+			rudderRight();
+		
+		if(kInput.keyW && !kInput.keyS)
+			accelerateInDirection(maxAcceleration, heading);
+		else if(!kInput.keyW && kInput.keyS)
+			decreaseWind();
+			
+			
+	}
+	
+	public void shipMove() {
+		setTurnRateFromRudderPosition();
+		turn();
+		//calculateDrag();
+	}
+	
+	public void setTurnRateFromRudderPosition() {
+		radialVelocity = rudderLocation / maxRudderLocation * maxRadialVelocity;
+	}
+	
+	public void rudderLeft() {
+		rudderLocation -= rudderSpeed;
+		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+	}
+	
+	public void rudderRight() {
+		rudderLocation += rudderSpeed;
+		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+	}
+	
+	public void turn() {
+		heading += radialVelocity;
+	}
+	
+	public void calculateDrag() {
+		movementDirection = velocity.get2DDirection();
+		
+		double redirectDragCoefficient = .1;
+		Vector dragVector = Game.rejectAOnB(velocity, new Vector(heading - movementDirection));
+		
+		System.out.println("----------");
+		System.out.println("drag vector:");
+		dragVector.print();
+		dragVector.multiplyAllComponentsBy(redirectDragCoefficient);
+		dragVector.print();
+		
+		System.out.println("velocity before drag:");
+		velocity.print();
+		
+		velocity.subtract(dragVector);
+		
+		System.out.println("velocity after drag:");
+		velocity.print();
+		System.out.println("----------");
+	}
+	
+	public void decreaseWind() {
+		windInSails -= windInSailsIncrement;
+		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+	
+	public void increaseWind() {
+		windInSails += windInSailsIncrement;
+		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+	
+	public void clampMovement() {
+		acceleration.clamp(maxAcceleration);
+		velocity.clamp(maxVelocity);
+	}
+	
+	public void render(Graphics g) {
+		Graphics2D g2d = (Graphics2D)g;
+		
+		g2d.rotate(heading, getCenterX(), getCenterY());
+		g.setColor(Color.black);
+		g.fillRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
+		g2d.rotate(-heading, getCenterX(), getCenterY());
+	}
+	
+	public void printShipInformation() {
+		System.out.println("Heading: " + heading + ", movementDirection: " + movementDirection);
+		System.out.println("rudderLocation: " + rudderLocation + ", windInSails: " + windInSails);
+		System.out.println("radialVelocity: " + radialVelocity);
+		System.out.println("radialDrag: " + radialDrag + ", straightLineDrag: " + straightLineDrag);
+	}
+
+	//HEALTH
+	public void decreaseHealthBy(double damage) {
+		health -= damage;
+		clampHealth();
+	}
+	
+	public void clampHealth() {
+		health = Game.clamp(health, 0, maxHealth);
+	}
+	
+	public double 	getHealth() {return Game.clamp(health, 0, maxHealth);}
+	public void 	setHealth(double d) {health = d;}
+	
+	public double 	getMaxHealth() {return maxHealth;}
+	public void 	setMaxHealth(double d) {maxHealth = d;}
+}
