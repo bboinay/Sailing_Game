@@ -53,6 +53,7 @@ public class KeyInput extends KeyAdapter{
 		if(key == KeyEvent.VK_4) 		{ key4 = true; }
 		if(key == KeyEvent.VK_G) 		{ keyG = true; }
 		if(key == KeyEvent.VK_E) 		{ keyE = true; }
+		if(key == KeyEvent.VK_Q) 		{ keyQ = true; }
 		if(key == KeyEvent.VK_F) 		{ keyF = true; }
 		
 		if(key == KeyEvent.VK_ESCAPE) {
@@ -88,6 +89,7 @@ public class KeyInput extends KeyAdapter{
 		if(key == KeyEvent.VK_4) 		{ key4 = false; }
 		if(key == KeyEvent.VK_G) 		{ keyG = false; }
 		if(key == KeyEvent.VK_E) 		{ keyE = false; }
+		if(key == KeyEvent.VK_Q) 		{ keyQ = false; }
 		if(key == KeyEvent.VK_F) 		{ keyF = false; }
 	}
 }

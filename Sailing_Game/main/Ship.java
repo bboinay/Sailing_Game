@@ -1,12 +1,13 @@
 package main;
-//test
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 public class Ship extends GameObject{
 	
-	public boolean selected = true;
+	public boolean selected = false;
 
 	public double health, maxHealth;
 	public double rudderLocation = 0; //-100 full left, +100 full right
@@ -27,8 +28,12 @@ public class Ship extends GameObject{
 	public double radialDrag;
 	public double straightLineDrag;
 	
+	public boolean ePressed, qPressed;
+	
+	public Game game;
 	public KeyInput kInput;
 	public MouseInput mInput;
+	public Handler handler;
 	
 	public Ship(Point3D location, Game game) {
 		super(location);
@@ -36,6 +41,8 @@ public class Ship extends GameObject{
 		width = 64;
 		height = 32;
 		
+		this.game = game;
+		handler = game.getHandler();
 		kInput = game.getKeyInput();
 		mInput = game.getMouseInput();
 		
@@ -53,11 +60,13 @@ public class Ship extends GameObject{
 	}
 
 	public void tick() {
-		if(!selected) return;
+		if(selected)
+			keyInputCheck();
 		
-		keyInputCheck();
-		printGameObjectVectors();
-		printShipInformation();
+		mInput.tick();
+		mouseInputCheck();
+		//printGameObjectVectors();
+		//printShipInformation();
 		
 		//clampMovement();
 		
@@ -96,8 +105,31 @@ public class Ship extends GameObject{
 		
 		if(kInput.keyW && !kInput.keyS)
 			increaseWind();
-		//else 
-			//decreaseWind();
+		else 
+			decreaseWind();
+		
+		if(kInput.keyQ && !qPressed) {
+			qPressed = true;
+			fireCannonsLeft();
+		} else if(!kInput.keyQ)
+			qPressed = false;
+		
+		if(kInput.keyE && !ePressed) {
+			ePressed = true;
+			fireCannonsRight();
+		} else if(!kInput.keyE)
+			ePressed = false;
+	}
+	
+	public void mouseInputCheck() {
+		int mx = game.getScreenMouseX();
+		int my = game.getScreenMouseY();
+		Rectangle tempMouse = new Rectangle(mx - 2, my - 2, 4, 4);
+		if(mInput.getSingleClicked() && tempMouse.intersects(getBounds())) 
+			selected = true;
+		else if(mInput.getSingleClicked() && !tempMouse.intersects(getBounds()))
+			selected = false;
+			
 	}
 	
 	public void rudderLeft() {
@@ -109,17 +141,37 @@ public class Ship extends GameObject{
 		rudderLocation += rudderSpeed;
 		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
 	}
-	
-	public void decreaseWind() {
-		windInSails -= windInSailsIncrement;
-		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
-	}
-	
+
 	public void increaseWind() {
 		windInSails += windInSailsIncrement;
 		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
 	}
+	
+	public void decreaseWind() {
+		windInSails -= windInSailsIncrement / 20.0;
+		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+	
+	public void fireCannonsRight() {
+		double angle = heading + Math.PI / 2;
+		fireCannons(5, angle);
+	}
+	
+	public void fireCannonsLeft() {
+		double angle = heading - Math.PI / 2;
+		fireCannons(5, angle);
+	}
 
+	public void fireCannons(int numberOfCannons, double cannonballDirection) {
+		for(int i = 0; i < numberOfCannons; i++) {
+			int whichPartOfShip = (int)(Math.random() * width - width / 2);
+			Point3D cannonballLocation = new Point3D(getCenterX() + (-height / 2) * Math.cos(heading), getCenterY() + whichPartOfShip * Math.sin(heading));
+			handler.addObject(new Cannonball(cannonballLocation, cannonballDirection));
+			cannonballLocation.print();
+			System.out.println("direction " + i + ": "+ cannonballDirection);
+		}
+	}
+	
 	public void calculateDrag() {
 		movementDirection = velocity.get2DDirection();
 	}
@@ -133,7 +185,7 @@ public class Ship extends GameObject{
 		Graphics2D g2d = (Graphics2D)g;
 		
 		g2d.rotate(heading, getCenterX(), getCenterY());
-		g.setColor(Color.black);
+		g.setColor(new Color(105, 62, 7));
 		g.fillRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
 		g2d.rotate(-heading, getCenterX(), getCenterY());
 	}

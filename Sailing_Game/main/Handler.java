@@ -21,6 +21,7 @@ public class Handler {
 		
 		for(int i = 0; i < object.size(); i++) {
 			object.get(i).tick();
+			
 		}
 		
 		//printNumberOfPlayersInHandler();

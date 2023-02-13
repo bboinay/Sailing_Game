@@ -33,5 +33,8 @@ public class MouseInput extends MouseAdapter{
 		return clickTimer;
 	}
 	
+	public boolean getSingleClicked() {
+		return clicked && clickTimer <= 2;
+	}
 }
 
