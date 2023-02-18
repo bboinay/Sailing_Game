@@ -15,5 +15,6 @@ public enum STATE{
 		Shop(),
 		Tutorial(),
 		
+		
 		Z();
 	}

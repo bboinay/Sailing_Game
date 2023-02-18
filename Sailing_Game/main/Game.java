@@ -171,13 +171,13 @@ public class Game extends Canvas implements Runnable{
 	public void renderGame(Graphics g) {
 		Graphics2D g2d = (Graphics2D)g;
 		
-		//g2d.translate(-cam.getX(),  -cam.getY());
+		g2d.translate(-cam.getX(),  -cam.getY());
 		
 		g.setColor(Color.blue);
 		g2d.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 		handler.render(g);
 		
-		//g2d.translate(cam.getX(),  cam.getY());
+		g2d.translate(cam.getX(),  cam.getY());
 	}
 
 	public void updateMouseLocation() {
@@ -275,6 +275,12 @@ public class Game extends Canvas implements Runnable{
 			}
 		}
 		return false;
+	}
+	
+	public static double min(double a, double b) {
+		if(a < b)
+			return a;
+		return b;
 	}
 	
 	

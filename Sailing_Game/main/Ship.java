@@ -38,8 +38,8 @@ public class Ship extends GameObject{
 	public Ship(Point3D location, Game game) {
 		super(location);
 		
-		width = 64;
-		height = 32;
+		width = 32;
+		height = 64;
 		
 		this.game = game;
 		handler = game.getHandler();
@@ -122,13 +122,16 @@ public class Ship extends GameObject{
 	}
 	
 	public void mouseInputCheck() {
-		int mx = game.getScreenMouseX();
-		int my = game.getScreenMouseY();
+		int mx = game.getMouseX();
+		int my = game.getMouseY();
 		Rectangle tempMouse = new Rectangle(mx - 2, my - 2, 4, 4);
-		if(mInput.getSingleClicked() && tempMouse.intersects(getBounds())) 
+		if(mInput.getSingleClicked() && tempMouse.intersects(getBounds())) {
 			selected = true;
-		else if(mInput.getSingleClicked() && !tempMouse.intersects(getBounds()))
+			game.getCamera().setCameraMode(CAMERAMODE.CameraLocked);
+		} else if(mInput.getSingleClicked() && !tempMouse.intersects(getBounds())) {
 			selected = false;
+			game.getCamera().setCameraMode(CAMERAMODE.CameraFree);
+		}
 			
 	}
 	
@@ -164,8 +167,8 @@ public class Ship extends GameObject{
 
 	public void fireCannons(int numberOfCannons, double cannonballDirection) {
 		for(int i = 0; i < numberOfCannons; i++) {
-			int whichPartOfShip = (int)(Math.random() * width - width / 2);
-			Point3D cannonballLocation = new Point3D(getCenterX() + (-height / 2) * Math.cos(heading), getCenterY() + whichPartOfShip * Math.sin(heading));
+			int whichPartOfShip = (int)(Math.random() * height - height / 2);
+			Point3D cannonballLocation = new Point3D(getCenterX() + whichPartOfShip * Math.cos(heading), getCenterY() + whichPartOfShip * Math.sin(heading));
 			handler.addObject(new Cannonball(cannonballLocation, cannonballDirection));
 			cannonballLocation.print();
 			System.out.println("direction " + i + ": "+ cannonballDirection);
@@ -188,6 +191,10 @@ public class Ship extends GameObject{
 		g.setColor(new Color(105, 62, 7));
 		g.fillRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
 		g2d.rotate(-heading, getCenterX(), getCenterY());
+		
+		g.setColor(Color.red);
+		g.fillRect((int)game.getCamera().getX() - 2, (int)game.getCamera().getY() - 2, 4, 4);
+		g2d.fill(new Rectangle(game.getMouseX() - 2, game.getMouseY() - 2, 4, 4));
 	}
 	
 	public void printShipInformation() {
