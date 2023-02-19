@@ -36,5 +36,6 @@ public class MouseInput extends MouseAdapter{
 	public boolean getSingleClicked() {
 		return clicked && clickTimer <= 2;
 	}
+	
 }
 

@@ -2,20 +2,7 @@ package main;
 
 
 public enum ID {
-	SpeechBubble(),		//1
-	Message(),			//1
-	NewZombie(),		//1
-	Zombie(), 			//1
-	Player(), 			//2
-	Bullet(), 			//3
-	Frag(),				//3
-	Buckshot(),			//100
-	Fragmentation(),	//100
-	Block(),			//100
-	CustomHitbox(),		//100
-	InvisBlock(),		//100
+	Cannonball(),
 	GameObject(),		
-	AmmoPickup(); 		//100
-	
-	
+	Ship;
 }

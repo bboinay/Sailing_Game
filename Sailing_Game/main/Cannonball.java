@@ -8,6 +8,7 @@ public class Cannonball extends GameObject{
 
 	public Cannonball(Point3D location, double angle) {
 		super(location);
+		this.id = ID.Cannonball;
 		
 		width = 5;
 		height = width;

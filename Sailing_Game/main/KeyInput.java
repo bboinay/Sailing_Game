@@ -10,8 +10,6 @@ public class KeyInput extends KeyAdapter{
 	private Handler handler;
 	private HUD hud;
 	
-	private Player player;
-	
 	public boolean keys[] = new boolean[13];
 	//keys 0 = true right
 	//keys 1 = true left
@@ -26,8 +24,6 @@ public class KeyInput extends KeyAdapter{
 		handler = game.getHandler();
 		hud = game.getHud();
 		
-		player = handler.getPlayer();
-		
 		for(int i = 0; i < keys.length; i++) {
 			keys[i] = false;
 		}
@@ -38,7 +34,6 @@ public class KeyInput extends KeyAdapter{
 		//if(game.getState() == STATE.SaveLoad)return; 
 		
 		int key = e.getKeyCode();
-		player = handler.getPlayer();
 		
 		if(key == KeyEvent.VK_D) 		{ keyD = true; }
 		if(key == KeyEvent.VK_A) 		{ keyA = true; }

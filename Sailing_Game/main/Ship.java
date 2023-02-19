@@ -7,7 +7,7 @@ import java.awt.Rectangle;
 
 public class Ship extends GameObject{
 	
-	public boolean selected = false;
+	public boolean selected = true;
 
 	public double health, maxHealth;
 	public double rudderLocation = 0; //-100 full left, +100 full right
@@ -37,9 +37,10 @@ public class Ship extends GameObject{
 	
 	public Ship(Point3D location, Game game) {
 		super(location);
+		id = ID.Ship;
 		
-		width = 32;
-		height = 64;
+		height = 32;
+		width = 64;
 		
 		this.game = game;
 		handler = game.getHandler();
@@ -49,14 +50,6 @@ public class Ship extends GameObject{
 		maxAcceleration = .01;
 		maxVelocity = .2;
 		
-		/*
-		Vector test = new Vector(2, 3, 6);
-		test.print();
-		System.out.println("length is: " + test.magnitude() + ", direction is: " + test.get2DDirection());
-		test.setMagnitude(8.1818);
-		test.print();
-		System.out.println("length is: " + test.magnitude() + ", direction is (+1.2) " + test.get2DDirection());
-		*/
 	}
 
 	public void tick() {
@@ -65,7 +58,7 @@ public class Ship extends GameObject{
 		
 		mInput.tick();
 		mouseInputCheck();
-		//printGameObjectVectors();
+		printGameObjectVectors();
 		//printShipInformation();
 		
 		//clampMovement();
@@ -124,14 +117,14 @@ public class Ship extends GameObject{
 	public void mouseInputCheck() {
 		int mx = game.getMouseX();
 		int my = game.getMouseY();
+		/*
 		Rectangle tempMouse = new Rectangle(mx - 2, my - 2, 4, 4);
 		if(mInput.getSingleClicked() && tempMouse.intersects(getBounds())) {
 			selected = true;
-			game.getCamera().setCameraMode(CAMERAMODE.CameraLocked);
 		} else if(mInput.getSingleClicked() && !tempMouse.intersects(getBounds())) {
 			selected = false;
-			game.getCamera().setCameraMode(CAMERAMODE.CameraFree);
 		}
+		*/
 			
 	}
 	

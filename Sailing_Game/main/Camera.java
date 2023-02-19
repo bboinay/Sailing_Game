@@ -5,12 +5,8 @@ public class Camera {
 
 	private double x, y, maxVelocity;
 	private Vector cameraVelocity;
-	private Player player = null;
 
 	private Game game;
-	
-	
-	private CAMERAMODE cameraMode = CAMERAMODE.CameraFree; 
 	
 	public Camera(Game game) {
 		this.game = game;
@@ -23,17 +19,6 @@ public class Camera {
 	
 	
 	public void tick() {
-		if(player == null) {
-			player = game.getHandler().getPlayer();
-			return;
-		}
-		
-		if(cameraMode == CAMERAMODE.CameraLocked) {
-			x = player.getX() - Game.MIDSCREENX;
-			y = player.getY()- Game.MIDSCREENY;
-		} else if(cameraMode == CAMERAMODE.CameraFree) {
-			moveScreenIfMouseAtEdge();
-		}
 		
 		x += cameraVelocity.getXComponent();
 		y += cameraVelocity.getYComponent();
@@ -66,14 +51,6 @@ public class Camera {
 		double distToRight = Game.WIDTH - mx;
 		
 		return Game.min(Game.min(distToTop, distToBottom), Game.min(distToLeft, distToRight));
-	}
-	
-	public CAMERAMODE getCameraMode() {
-		return cameraMode;
-	}
-	
-	public void setCameraMode(CAMERAMODE c) {
-		cameraMode = c;
 	}
 	
 	public double getX() {
