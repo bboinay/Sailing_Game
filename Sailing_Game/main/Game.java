@@ -136,46 +136,35 @@ public class Game extends Canvas implements Runnable{
 	
 	private void tick() {
 		updateMouseLocation();
-		testPrintMouseLocation();
+		//testPrintMouseLocation();
 		//experimental, to keep mouseX and mouseY up to date? idk. think this is important for full auto but still testing
 		mInput.tick();
-		
-		switch(gameState) {
-			case Game:
-				handler.tick();
-				cam.tick();
-				hud.tick();
-				break;	
-		default:
-			break;
-		}
+		handler.tick();
 	}
 	
 	public void render() {
-		
 		//Buffer strat stuff I don't understand
 		BufferStrategy bs = this.getBufferStrategy();
 		if(bs == null) {
 			this.createBufferStrategy(3);
 			return;
 		}
-		
 		Graphics g = bs.getDrawGraphics();
+		//end of confusing stuff
+		
+		
 		
 		g.setColor(Color.pink);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
-		switch(gameState) {
-			case Game:
-				renderGame(g);
-				hud.render(g);
-				break;	
-		default:
-			break;
-		}
+		renderGame(g);
 		
+		
+		
+		//Buffer strat stuff I don't understand
 		bs.show();
 		g.dispose();
+		//end of confusing stuff
 	}
 	
 	public void renderGame(Graphics g) {
@@ -187,7 +176,7 @@ public class Game extends Canvas implements Runnable{
 		g2d.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 		handler.render(g);
 		
-		g2d.translate(cam.getX(),  cam.getY());
+		//g2d.translate(cam.getX(),  cam.getY());
 	}
 
 	public void updateMouseLocation() {

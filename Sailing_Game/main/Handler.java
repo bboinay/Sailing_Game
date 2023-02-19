@@ -7,31 +7,28 @@ public class Handler {
 
 	public LinkedList<GameObject> object = new LinkedList<GameObject>();
 	private Game game;
-	private Camera cam;
+	private Camera cam; //ignore all cam stuff for now
 	private double renderDistance = Game.WIDTH * 1.2f;
 	
 	public Handler(Game game) {
 		this.game = game;
-		cam = game.getCamera();
+		cam = game.getCamera(); //ignore all cam stuff for now
 	}
 	
 	public void tick() {
-		
-		print();
 		for(int i = 0; i < object.size(); i++) {
 			object.get(i).tick();
-			
 		}
-		
-		//printNumberOfPlayersInHandler();
 	}
 	
 
 	public void render(Graphics g) {
+		//ignore all cam stuff for now
 		if(cam == null) {
 			cam = game.getCamera();
 			return;
 		}
+		
 		for(int i = 0; i < object.size(); i++) {
 			GameObject temp = object.get(i);
 			if(Game.magnitude(temp.getX() - cam.getX(), temp.getY() - cam.getY()) < renderDistance)

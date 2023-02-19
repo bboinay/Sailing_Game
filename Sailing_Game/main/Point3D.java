@@ -40,6 +40,12 @@ public class Point3D {
 		this.z = z;
 	}
 	
+	public void addVector(Vector v) {
+		x += v.getXComponent();
+		y += v.getYComponent();
+		z += v.getZComponent();
+	}
+	
 	public void print() {
 		System.out.println("(" + x + ", " + y + ", " + z + ")");
 	}

@@ -9,18 +9,17 @@ public class Ship extends GameObject{
 	
 	public boolean selected = true;
 
-	public double health, maxHealth;
-	public double rudderLocation = 0; //-100 full left, +100 full right
-	public double minRudderLocation = -100;
-	public double maxRudderLocation = 100;
-	public double rudderSpeed = .5; //how quickly rudderLocation increases or decreases
+	public double rudderPosition = 0; //-100 full left, +100 full right
+	public double minRudderPosition = -100;
+	public double maxRudderPosition = 100;
+	public double rudderSpeed = .5; //how quickly rudderPosition increases or decreases
 	
 	public double windInSails = 0;
 	public double maxWindInSails = 100;
 	public double windInSailsIncrement = 2;
 	
-	public double radialVelocity;
-	public double maxRadialVelocity = .005;
+	public double turnRate;
+	public double maxTurnRate = .005;
 
 	public double heading;
 	public double movementDirection;
@@ -53,12 +52,9 @@ public class Ship extends GameObject{
 	}
 
 	public void tick() {
-		if(selected)
-			keyInputCheck();
-		
-		mInput.tick();
+		keyInputCheck();
 		mouseInputCheck();
-		printGameObjectVectors();
+		//printGameObjectVectors();
 		//printShipInformation();
 		
 		//clampMovement();
@@ -67,21 +63,25 @@ public class Ship extends GameObject{
 		advance();
 	}
 	
+	//finds turnRate from rudderPosition, updates heading and velocity accordingly
 	public void turn() {
 		setTurnRateFromRudderPosition();
-		heading += radialVelocity;
-		velocity.turn(radialVelocity);
+		heading += turnRate;
+		velocity.turn(turnRate);
 	}
 	
+	//links rudderPosition to turnRate 
 	public void setTurnRateFromRudderPosition() {
-		radialVelocity = rudderLocation / maxRudderLocation * maxRadialVelocity;
+		turnRate = rudderPosition / maxRudderPosition * maxTurnRate;
 	}
 	
+	//sets velocity and moves location accordingly
 	public void advance() {
 		setVelocityFromWindInSails();
-		location = velocity.movePoint(location);
+		location.addVector(velocity);
 	}
 	
+	//this method links windInSails to boat's velocity
 	public void setVelocityFromWindInSails() {
 		double newVelocityMag = windInSails / maxWindInSails * maxVelocity;
 		if(velocity.magnitude() == 0) {
@@ -91,16 +91,19 @@ public class Ship extends GameObject{
 	}
 
 	public void keyInputCheck() {
+		//handling left-right inputs
 		if(kInput.keyA && !kInput.keyD)
 			rudderLeft();
 		else if(!kInput.keyA && kInput.keyD)
 			rudderRight();
 		
+		//handling up-down inputs
 		if(kInput.keyW && !kInput.keyS)
 			increaseWind();
 		else 
 			decreaseWind();
 		
+		//handling cannon inputs
 		if(kInput.keyQ && !qPressed) {
 			qPressed = true;
 			fireCannonsLeft();
@@ -115,6 +118,7 @@ public class Ship extends GameObject{
 	}
 	
 	public void mouseInputCheck() {
+		mInput.tick();
 		int mx = game.getMouseX();
 		int my = game.getMouseY();
 		/*
@@ -129,23 +133,41 @@ public class Ship extends GameObject{
 	}
 	
 	public void rudderLeft() {
-		rudderLocation -= rudderSpeed;
-		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+		rudderPosition -= rudderSpeed;
+		clampRudder();
 	}
 	
 	public void rudderRight() {
-		rudderLocation += rudderSpeed;
-		rudderLocation = Game.clamp(rudderLocation, minRudderLocation, maxRudderLocation);
+		rudderPosition += rudderSpeed;
+		clampRudder();
+	}
+	
+	//makes sure rudder stays within its limits (min/maxRudderPosition)
+	public void clampRudder() {
+		rudderPosition = Game.clamp(rudderPosition, minRudderPosition, maxRudderPosition);
 	}
 
 	public void increaseWind() {
 		windInSails += windInSailsIncrement;
-		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+		clampWindInSails();
 	}
 	
 	public void decreaseWind() {
 		windInSails -= windInSailsIncrement / 20.0;
+		clampWindInSails();
+	}
+	
+	//makes sure wind amount stays within its limits (0/maxWindInSails)
+	public void clampWindInSails() {
 		windInSails = Game.clamp(windInSails, 0, maxWindInSails);
+	}
+
+	public void fireCannons(int numberOfCannons, double cannonballDirection) {
+		for(int i = 0; i < numberOfCannons; i++) {
+			int whichPartOfShip = (int)(Math.random() * height - height / 2);
+			Point3D cannonballLocation = new Point3D(getCenterX() + whichPartOfShip * Math.cos(heading), getCenterY() + whichPartOfShip * Math.sin(heading));
+			handler.addObject(new Cannonball(cannonballLocation, cannonballDirection));
+		}
 	}
 	
 	public void fireCannonsRight() {
@@ -156,20 +178,6 @@ public class Ship extends GameObject{
 	public void fireCannonsLeft() {
 		double angle = heading - Math.PI / 2;
 		fireCannons(5, angle);
-	}
-
-	public void fireCannons(int numberOfCannons, double cannonballDirection) {
-		for(int i = 0; i < numberOfCannons; i++) {
-			int whichPartOfShip = (int)(Math.random() * height - height / 2);
-			Point3D cannonballLocation = new Point3D(getCenterX() + whichPartOfShip * Math.cos(heading), getCenterY() + whichPartOfShip * Math.sin(heading));
-			handler.addObject(new Cannonball(cannonballLocation, cannonballDirection));
-			cannonballLocation.print();
-			System.out.println("direction " + i + ": "+ cannonballDirection);
-		}
-	}
-	
-	public void calculateDrag() {
-		movementDirection = velocity.get2DDirection();
 	}
 	
 	public void clampMovement() {
@@ -192,24 +200,8 @@ public class Ship extends GameObject{
 	
 	public void printShipInformation() {
 		System.out.println("Heading: " + heading + ", movementDirection: " + movementDirection);
-		System.out.println("rudderLocation: " + rudderLocation + ", windInSails: " + windInSails);
-		System.out.println("radialVelocity: " + radialVelocity);
+		System.out.println("rudderPosition: " + rudderPosition + ", windInSails: " + windInSails);
+		System.out.println("turnRate: " + turnRate);
 		System.out.println("radialDrag: " + radialDrag + ", straightLineDrag: " + straightLineDrag);
 	}
-
-	//HEALTH
-	public void decreaseHealthBy(double damage) {
-		health -= damage;
-		clampHealth();
-	}
-	
-	public void clampHealth() {
-		health = Game.clamp(health, 0, maxHealth);
-	}
-	
-	public double 	getHealth() {return Game.clamp(health, 0, maxHealth);}
-	public void 	setHealth(double d) {health = d;}
-	
-	public double 	getMaxHealth() {return maxHealth;}
-	public void 	setMaxHealth(double d) {maxHealth = d;}
 }
