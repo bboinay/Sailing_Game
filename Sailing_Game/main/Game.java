@@ -1,3 +1,4 @@
+//fart
 package main;
 
 import java.awt.AWTEvent;
@@ -15,6 +16,8 @@ import javax.swing.JFrame;
 
 public class Game extends Canvas implements Runnable{
 
+	
+	
 	//This is all general stuff the "Game" should be aware of (this is background 
 	//stuff you don't need to worry about)
 	private static final long serialVersionUID = -3885519666922197636L;
